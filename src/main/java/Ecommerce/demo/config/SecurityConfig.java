@@ -1,6 +1,7 @@
 package Ecommerce.demo.config;
 
 import jakarta.servlet.Filter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,52 +20,47 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final UserDetailsService userDetailsService;
-    private final JWTFilter jwtFilter;
+    @Autowired
+    public UserDetailsService userDetailsService;
 
-    public SecurityConfig(UserDetailsService userDetailsService, JWTFilter jwtFilter) {
-        this.userDetailsService = userDetailsService;
-        this.jwtFilter = jwtFilter;
-    }
+    @Autowired
+    private JWTFilter jwtFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable())  // Disable CSRF for JWT
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
-                .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/register", "/login").permitAll()  // Allow public access
-                        .requestMatchers("/Orders").authenticated()  // Protect authenticated routes
-                        .anyRequest().authenticated()) // Default Protection
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // No Session
-                .authenticationProvider(authenticationProvider()) // Set Authentication Provider
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)  // Add JWT filter
+                .csrf(csrf -> csrf.disable())  // Disable CSRF for all endpoints
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))  // Enable CORS
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers("/register", "/login", "/logout").permitAll()  // Public routes
+                        .requestMatchers("/Orders").authenticated()  // Protected routes
+                        .anyRequest().authenticated())  // Secure everything else
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Stateless session
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)  // Apply JWT Filter
                 .build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(
-                "https://e-commerce-alpha-five-96.vercel.app",
-                "http://localhost:4200"
-        ));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
-        configuration.setExposedHeaders(List.of("Authorization"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowedOrigins(Arrays.asList("https://e-commerce-alpha-five-96.vercel.app")); // Allow frontend
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Ensure POST is allowed
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+        configuration.setAllowCredentials(true); // Enable cookies
+        configuration.setMaxAge(3600L); // Cache preflight request for 1 hour
+
+        // Ensure preflight requests are properly handled
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
