@@ -32,4 +32,8 @@ public class ProductService {
     public List<Product> getProductsByUserId(Long userId) {
         return productRepo.findByuser_id(userId); // ✅ Fetch all products by userId
     }
+
+    public List<Product> addMultipleProducts(List<Product> products) {
+        return productRepo.saveAll(products);
+    }
 }
