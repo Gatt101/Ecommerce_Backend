@@ -16,7 +16,6 @@ public class ProductController {
 
     @GetMapping("/Orders/{id}")
     public List<Product> getProducts(@PathVariable Long id) {
-//        return productService.getProductsByid(id); // Fix: Use getProductsByid instead of getProductsByUserId
         return productService.getProductsByUserId(id); // ✅ Fetch all products by userId
     }
 
@@ -34,7 +33,7 @@ public class ProductController {
                 System.out.println("Error: Received null product");
                 return null;
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // ✅ Log error for debugging
             System.out.println("Error: " + e.getMessage());
             return null;
@@ -57,7 +56,7 @@ public class ProductController {
                 System.out.println("Error: Received null products");
                 return null;
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // ✅ Log error for debugging
             System.out.println("Error: " + e.getMessage());
             return null;
