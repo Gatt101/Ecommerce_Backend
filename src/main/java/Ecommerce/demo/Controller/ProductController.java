@@ -8,15 +8,15 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.util.List;
 
-@RestController // Base path for cleaner URLs
+@RestController
 public class ProductController {
 
     @Autowired
     private ProductService productService;
 
     @GetMapping("/Orders/{id}")
-    public List<Product> getProducts(@PathVariable Long id) {
-        return productService.getProductsByUserId(id); // ✅ Fetch all products by userId
+    public List<Product> getProducts(@PathVariable String id) {
+        return productService.getProductsByUserId(id); 
     }
 
     @PostMapping("/Orders")

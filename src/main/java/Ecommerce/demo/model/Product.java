@@ -1,40 +1,26 @@
 package Ecommerce.demo.model;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.Instant;
 
-@Entity
-@Table(name = "user_product_history") // ✅ Ensure table name is correct
+@Document(collection = "user_product_history")
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @ManyToOne // ✅ Proper Foreign Key Mapping
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user; // ✅ Reference User Entity
-
-    @Column(name = "product_id", nullable = false)
+    private String id;
+    private String userId; // Reference to User's id
     private Long productId;
-
-    @Column(name = "product_name", nullable = false)
     private String productName;
-
-    @Column(name = "price", nullable = false)
     private Double price;
-
-    @Column(name = "quantity", nullable = false)
     private Integer quantity;
-
-    @Column(name = "viewed_at", nullable = false)
     private Instant viewedAt;
 
     // ✅ Constructors
     public Product() {}
 
-    public Product(User user, Long productId, String productName, Double price, Integer quantity, Instant viewedAt) {
-        this.user = user;
+    public Product(String userId, Long productId, String productName, Double price, Integer quantity, Instant viewedAt) {
+        this.userId = userId;
         this.productId = productId;
         this.productName = productName;
         this.price = price;
@@ -43,11 +29,11 @@ public class Product {
     }
 
     // ✅ Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
+    public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
 
     public Long getProductId() { return productId; }
     public void setProductId(Long productId) { this.productId = productId; }
