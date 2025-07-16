@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -20,13 +21,15 @@ public class ProductController {
     }
 
     @PostMapping("/Orders")
-    public Product addProduct(@RequestBody Product product) {
+    public Product addProduct(@RequestBody Product product, Principal principal) {
         try {
             // ✅ Log request for debugging
             System.out.println("Received Order: " + product);
 
             // ✅ Ensure the order is saved correctly
             if (product != null) {
+                // Set userId to the authenticated user's username
+                product.setUserId(principal.getName());
                 product.setViewedAt(Instant.now()); // Set timestamp
                 return productService.addProduct(product);
             } else {
@@ -41,7 +44,7 @@ public class ProductController {
     }
 
     @PostMapping("/Orders/multiple")
-    public List<Product> addMultipleProducts(@RequestBody List<Product> products) { // Fix: Use @RequestBody instead of @PathVariable
+    public List<Product> addMultipleProducts(@RequestBody List<Product> products, Principal principal) {
         try {
             // ✅ Log request for debugging
             System.out.println("Received Orders: " + products);
@@ -49,6 +52,7 @@ public class ProductController {
             // ✅ Ensure the orders are saved correctly
             if (products != null) {
                 for (Product product : products) {
+                    product.setUserId(principal.getName());
                     product.setViewedAt(Instant.now()); // Set timestamp
                 }
                 return productService.addMultipleProducts(products);
