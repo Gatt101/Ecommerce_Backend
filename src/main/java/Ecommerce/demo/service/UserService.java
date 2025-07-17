@@ -43,4 +43,9 @@ public class UserService {
         String username = jwtService.extractUsername(jwt);
         return userRepo.findByUsername(username);
     }
+
+    public String getNameByUsername(String username) {
+        User user = userRepo.findByUsername(username);
+        return user != null ? user.getName() : null;
+    }
 }

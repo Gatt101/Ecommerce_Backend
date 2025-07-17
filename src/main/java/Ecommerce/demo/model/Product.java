@@ -9,14 +9,14 @@ public class Product {
 
     @Id
     private String id;
-    private String userId; // Reference to User's id
+    private String userId;
     private Long productId;
     private String productName;
     private Double price;
     private Integer quantity;
     private Instant viewedAt;
 
-    // ✅ Constructors
+    
     public Product() {}
 
     public Product(String userId, Long productId, String productName, Double price, Integer quantity, Instant viewedAt) {
@@ -28,7 +28,7 @@ public class Product {
         this.viewedAt = viewedAt;
     }
 
-    // ✅ Getters and Setters
+   
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
