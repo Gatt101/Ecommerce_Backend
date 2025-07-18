@@ -17,6 +17,9 @@ public class Product {
     @JsonProperty("productName") 
     private String productName;
 
+    @JsonProperty("image")
+    private String productImage;
+
     private double price;
 
     @JsonProperty("user_id") 
@@ -25,11 +28,15 @@ public class Product {
     @JsonProperty("viewedAt")
     private Instant viewedAt;
 
+
+
     private int quantity;
 
     // Getters and setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
+    public String getProductImage() { return productImage; }
+    public void setProductImage(String productImage) { this.productImage = productImage; }
     public String getProductId() { return productId; }
     public void setProductId(String productId) { this.productId = productId; }
     public String getProductName() { return productName; }

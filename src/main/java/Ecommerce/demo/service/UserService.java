@@ -48,4 +48,8 @@ public class UserService {
         User user = userRepo.findByUsername(username);
         return user != null ? user.getName() : null;
     }
+
+    public User getUserByUsername(String username) {
+        return userRepo.findByUsername(username);
+    }
 }

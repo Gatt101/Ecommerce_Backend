@@ -14,7 +14,8 @@ public class UserController {
     @GetMapping("/me")
     public User getUserInfo(@RequestHeader("Authorization") String token) {
         String jwt = token.substring(7);
-        return userService.getUserInfo(jwt);
+        User user = userService.getUserInfo(jwt);
+        return user;
     }
 
     @PostMapping("/login")
