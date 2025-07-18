@@ -2,98 +2,57 @@ package Ecommerce.demo.Controller;
 
 import Ecommerce.demo.model.Product;
 import Ecommerce.demo.service.ProductService;
-import Ecommerce.demo.service.UserService;
-import Ecommerce.demo.service.ProductCatalogService;
-import Ecommerce.demo.model.ProductCatalog;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
 import java.security.Principal;
+import java.time.Instant;
 import java.util.List;
 
 @RestController
+@RequestMapping("/orders") // Changed to lowercase for consistency
 public class ProductController {
 
     @Autowired
     private ProductService productService;
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private ProductCatalogService productCatalogService;
-
-    @GetMapping("/Orders/{id}")
-    public List<Product> getProducts(@PathVariable String id) {
-        return productService.getProductsByUserId(id); 
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<Product>> getProducts(@PathVariable String userId) {
+        List<Product> products = productService.getProductsByUserId(userId);
+        return ResponseEntity.ok(products);
     }
 
-    @PostMapping("/Orders")
-    public Product addProduct(@RequestBody Product product, Principal principal) {
-        try {
-            System.out.println("Received Order: " + product);
-    
-            if (product != null) {
-                String username = principal.getName();
-                String name = userService.getNameByUsername(username);
-                product.setUserId(name);
-                product.setViewedAt(Instant.now());
-    
-                if (product.getProductId() != null) {
-                    ProductCatalog catalog = productCatalogService.getProductById(product.getProductId());
-                    if (catalog != null) {
-                        product.setProductName(catalog.getProductName());
-                        product.setPrice(catalog.getPrice());
-                    } else {
-                        System.out.println("Error: Product catalog entry not found for productId: " + product.getProductId());
-                    }
-                } else {
-                    System.out.println("Error: productId is null for product: " + product);
-                }
-                return productService.addProduct(product);
-            } else {
-                System.out.println("Error: Received null product");
-                return null;
-            }
-        } catch (Throwable e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+    @PostMapping("/single")
+    public ResponseEntity<Product> addProduct(@Validated @RequestBody Product product, Principal principal) {
+        // The frontend no longer sends user_id; always use the authenticated user
+        String username = principal.getName();
+        product.setUserId(username); // Always set userId from Principal
+        product.setViewedAt(product.getViewedAt() == null ? Instant.now() : product.getViewedAt());
+
+        // Validate required fields
+        if (product.getProductId() == null || product.getProductName() == null || product.getPrice() <= 0 || product.getQuantity() <= 0) {
+            throw new IllegalArgumentException("productId, productName, price, and quantity are required and must be valid");
         }
+
+        Product savedProduct = productService.addProduct(product);
+        return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
     }
-    
-    @PostMapping("/Orders/multiple")
-    public List<Product> addMultipleProducts(@RequestBody List<Product> products, Principal principal) {
-        try {
-            System.out.println("Received Orders: " + products);
-    
-            if (products != null) {
-                String username = principal.getName();
-                String name = userService.getNameByUsername(username);
-                for (Product product : products) {
-                    product.setUserId(name);
-                    product.setViewedAt(Instant.now());
-    
-                    if (product.getProductId() != null) {
-                        ProductCatalog catalog = productCatalogService.getProductById(product.getProductId());
-                        if (catalog != null) {
-                            product.setProductName(catalog.getProductName());
-                            product.setPrice(catalog.getPrice());
-                        } else {
-                            System.out.println("Error: Product catalog entry not found for productId: " + product.getProductId());
-                        }
-                    } else {
-                        System.out.println("Error: productId is null for product: " + product);
-                    }
-                }
-                return productService.addMultipleProducts(products);
-            } else {
-                System.out.println("Error: Received null products");
-                return null;
+
+    @PostMapping("/multiple")
+    public ResponseEntity<List<Product>> addMultipleProducts(@Validated @RequestBody List<Product> products, Principal principal) {
+        // The frontend no longer sends user_id; always use the authenticated user
+        String username = principal.getName();
+        for (Product product : products) {
+            product.setUserId(username); // Always set userId from Principal
+            product.setViewedAt(product.getViewedAt() == null ? Instant.now() : product.getViewedAt());
+            if (product.getProductId() == null || product.getProductName() == null || product.getPrice() <= 0 || product.getQuantity() <= 0) {
+                throw new IllegalArgumentException("productId, productName, price, and quantity are required and must be valid for all products");
             }
-        } catch (Throwable e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
         }
+        List<Product> savedProducts = productService.addMultipleProducts(products);
+        return new ResponseEntity<>(savedProducts, HttpStatus.CREATED);
     }
 }

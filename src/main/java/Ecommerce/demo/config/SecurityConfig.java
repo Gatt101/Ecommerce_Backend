@@ -38,7 +38,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))  // Enable CORS
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/register", "/login", "/logout").permitAll()  // Public routes
-                        .requestMatchers("/Orders").authenticated()  // Protected routes
+                        .requestMatchers("/Orders/**").authenticated()  // Protected routes
                         .anyRequest().authenticated())  // Secure everything else
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Stateless session
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)  // Apply JWT Filter

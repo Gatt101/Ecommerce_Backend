@@ -16,4 +16,5 @@ import java.util.function.Function;
 @Repository
 public interface ProductRepo extends MongoRepository<Product, String> {
     List<Product> findByUserId(String userId);
+    List<Product> findByProductId(String productId);
 }

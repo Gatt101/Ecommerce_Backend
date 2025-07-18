@@ -1,52 +1,50 @@
 package Ecommerce.demo.model;
 
-import org.springframework.data.annotation.Id;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.MongoId;
+
 import java.time.Instant;
 
-@Document(collection = "user_product_history")
+@Document(collection = "products")
 public class Product {
+    @MongoId
+    private String id; 
 
-    @Id
-    private String id;
-    private String userId;
-    private Long productId;
+    @JsonProperty("productId") 
+    private String productId;
+
+    @JsonProperty("productName") 
     private String productName;
-    private Double price;
-    private Integer quantity;
+
+    private double price;
+
+    @JsonProperty("user_id") 
+    private String userId;
+
+    @JsonProperty("viewedAt")
     private Instant viewedAt;
 
-    
-    public Product() {}
+    private int quantity;
 
-    public Product(String userId, Long productId, String productName, Double price, Integer quantity, Instant viewedAt) {
-        this.userId = userId;
-        this.productId = productId;
-        this.productName = productName;
-        this.price = price;
-        this.quantity = quantity;
-        this.viewedAt = viewedAt;
-    }
-
-   
+    // Getters and setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
-
-    public String getUserId() { return userId; }
-    public void setUserId(String userId) { this.userId = userId; }
-
-    public Long getProductId() { return productId; }
-    public void setProductId(Long productId) { this.productId = productId; }
-
+    public String getProductId() { return productId; }
+    public void setProductId(String productId) { this.productId = productId; }
     public String getProductName() { return productName; }
     public void setProductName(String productName) { this.productName = productName; }
-
-    public Double getPrice() { return price; }
-    public void setPrice(Double price) { this.price = price; }
-
-    public Integer getQuantity() { return quantity; }
-    public void setQuantity(Integer quantity) { this.quantity = quantity; }
-
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
+    public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
     public Instant getViewedAt() { return viewedAt; }
     public void setViewedAt(Instant viewedAt) { this.viewedAt = viewedAt; }
+    public int getQuantity() { return quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
+
+    @Override
+    public String toString() {
+        return "Product{id='" + id + "', productId='" + productId + "', productName='" + productName + "', price=" + price + ", userId='" + userId + "', viewedAt=" + viewedAt + ", quantity=" + quantity + "}";
+    }
 }
